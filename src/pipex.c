@@ -16,10 +16,10 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 
-//int parent(){
-//
-//};
-//
+int parent(int *fd_pipe, int fd_infile, char *cmd){
+
+}
+
 
 int child(int *fd_pipe, int fd_infile, char *cmd){
     dup2()
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     //opening files
     fd_infile = open(argv[1], O_RDONLY);
-    fd_infile = open(argv[4], O_WRONLY | O_CREAT, 0644);
+    fd_outfile = open(argv[4], O_WRONLY | O_CREAT, 0644);
     //pipe into fd_pipe, check for failure
     if (pipe(fd_pipe) < 0)
         return (1);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     //parent process (cmd2 file2
     else {
         wait(NULL);
-        printf("parent");
+        parent(fd_pipe, fd_outfile, argv[2]);
     }
     return (0);
 }
