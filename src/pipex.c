@@ -16,13 +16,64 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 
-int parent(int *fd_pipe, int fd_infile, char *cmd){
+// > Launch
+// > Pipe
+// > Fork Process
 
+// > Call Child Process
+//      > Close read end of pipe, pipe[0]
+//      > Redirect stdin to infile
+//      > Redirect stdout to write end of pipe, pipe[1]
+//      > Execute command
+//              > Find path of the appropriate command
+//              > Call execve using the path
+
+// > Call Parent Process
+//      > Close write end of pipe, pipe[1]
+//      > Redirect stdout to outfile
+//      > Redirect stdin to read end of pipe, pipe[0]
+//      > Execute command
+//              > Find path of the appropriate command
+//              > Call execve using the path
+//
+//
+
+//execve(const char *path, char *const argv[], char *const envp[]);
+
+#include "../include/pipex.h"
+
+char **get_args(char *cmd_buffer){
+    char **argv;
+
+    argv = malloc(sizeof(char *) * 2);
+    if (!argv)
+        return (NULL);
+    if (!(ft_strchr(cmd_buffer, ' ')))
+        argv[0] = ft_strjoin("/bin/", cmd_buffer);
+    argv[1] = NULL;
+    return (argv);
 }
 
+int child(int *fd_pipe, int fd_infile, char *cmd_buffer){
+    char **argv;
 
-int child(int *fd_pipe, int fd_infile, char *cmd){
-    dup2()
+    argv = get_args(cmd_buffer);
+    close(fd_pipe[0]);
+    dup2(fd_infile, 0);
+    dup2(fd_pipe[1], 1);
+    execve(argv[0], argv, NULL);
+    return (0);
+}
+
+int parent(int *fd_pipe, int fd_outfile, char *cmd_buffer){
+    char **argv;
+
+    argv = get_args(cmd_buffer);
+    close(fd_pipe[1]);
+    dup2(fd_pipe[0], 0);
+    dup2(fd_outfile, 1);
+    execve(argv[0], argv, NULL);
+    return (0);
 }
 
 int main(int argc, char *argv[])
@@ -32,24 +83,18 @@ int main(int argc, char *argv[])
     int fd_infile;
     int fd_outfile;
 
-    if (argc < 4 || argc > 5)
+    if (argc != 5)
         return (0);
-
-    //opening files
     fd_infile = open(argv[1], O_RDONLY);
     fd_outfile = open(argv[4], O_WRONLY | O_CREAT, 0644);
-    //pipe into fd_pipe, check for failure
     if (pipe(fd_pipe) < 0)
         return (1);
-    //fork process
     process_id = fork();
-    //child process (file1 cmd1)
     if (process_id == 0)
         child(fd_pipe, fd_infile, argv[2]);
-    //parent process (cmd2 file2
     else {
         wait(NULL);
-        parent(fd_pipe, fd_outfile, argv[2]);
+        parent(fd_pipe, fd_outfile, argv[3]);
     }
     return (0);
 }

@@ -10,32 +10,38 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME	= pipex
-FLAGS	= -Wall -Werror -Wextra -g
-COMPILE	= gcc
-SRC_DIR		= src/
-OBJ_DIR		= obj/
+NAME    = pipex
+CC		= gcc
+CFLAGS	= -Werror -Wextra -Wall
 
-SRC = pipex.c
+SRC_PATH    =   src/
+OBJ_PATH    =   obj/
 
-SRCS = $(addprefix $(SRC_DIR), $(SRC))
-OBJS = $(SRCS:$(SRC_DIR)%.c=$(OBJ_DIR)%.o)
+SRC         =	execute.c misc.c pipex.c
+SRCS        =   $(addprefix, $(SRC_PATH), $(SRC))
 
-all : $(NAME)
+OBJ         =   $(SRC:.c=.o)
+OBJS		=	$(addprefix $(OBJ_PATH), $(OBJ))
 
-$(NAME) : $(OBJS)
-	@$(COMPILE) $(FLAGS) $(OBJS) -o $(NAME)
+INC         =   -I ./include/
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	mkdir -p $(OBJ_DIR)
-	$(COMPILE) $(FLAGS) -c $< -o $@
+all: $(OBJ_PATH) $(NAME)
+
+$(OBJ_PATH)%.o: $(SRC_PATH)%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(INC)
+
+$(OBJ_PATH):
+	mkdir $(OBJ_PATH)
+
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
-	rm -rf $(OBJ_DIR)
+	rm -rf $(OBJ_PATH)
 
-fclean: clean
+fclean:	clean
 	rm -f $(NAME)
 
-re: fclean all
+re:	fclean all
 
 .PHONY: all clean fclean re
