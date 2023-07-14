@@ -67,3 +67,28 @@ size_t	ft_strlen(const char *s)
         i++;
     return (i);
 }
+
+size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
+{
+    size_t	i;
+
+    i = 0;
+    if (dstsize != 0)
+    {
+        while ((dstsize - 1) != '\0' && *src)
+        {
+            *(dst++) = *(src++);
+            dstsize--;
+            i++;
+        }
+        *(dst) = '\0';
+        src -= i;
+        i = 0;
+    }
+    while (*src)
+    {
+        i++;
+        src++;
+    }
+    return (i);
+}
