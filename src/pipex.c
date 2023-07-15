@@ -42,47 +42,62 @@
 
 #include "../include/pipex.h"
 
+
+int count_args(char *cmd_buffer){
+    if (!ft_strchr(cmd_buffer, ' '))
+        return (1);
+    else
+        return (2);
+}
+
 char **get_args(char *cmd_buffer){
-    static char **exec_args;
-    char *cmd;
-//    char *flag;
+    char **exec_args;
+    char *arg1;
+    int count;
     int len;
 
-    exec_args = malloc(sizeof(char *) * (3 + 1));
-    if (!(ft_strchr(cmd_buffer, ' '))) {
-        exec_args[0] = ft_strjoin("/bin/", cmd_buffer);
-        exec_args[1] = NULL;
-        exec_args[2] = NULL;
+    len = 0;
+    count = count_args(cmd_buffer);
+    exec_args = malloc((sizeof(char *) * count + 1));
+    if (!exec_args)
+        return (NULL);
+    if (count != 1) {
+        while (cmd_buffer[len] != ' ')
+            len++;
+        arg1 = malloc(sizeof(char) * len + 1);
+        if (!arg1)
+            return (NULL);
+        ft_strlcpy(arg1, cmd_buffer, len + 1);
+        exec_args[0] = ft_strjoin("/bin/", arg1);
+        free(arg1);
+        printf("%s\n", exec_args[0]);
+        exec_args[1] = ft_substr(cmd_buffer, len + 1, 3);
+        exec_args[3] = NULL;
         return (exec_args);
     }
-    len = 0;
-    while (cmd_buffer[len] != ' ')
-        len ++;
-    cmd = malloc((sizeof(char) * (len + 1)));
-    if (!cmd)
-        return (NULL);
+
     return (NULL);
 }
 
 int child(int *fd_pipe, int fd_infile, char *cmd_buffer){
     char **exec_args;
 
-    exec_args = get_args(cmd_buffer);
+    get_args(cmd_buffer);
     close(fd_pipe[0]);
     dup2(fd_infile, 0);
     dup2(fd_pipe[1], 1);
-    execve(exec_args[0], exec_args, NULL);
+    execve("/bin/", exec_args, NULL);
     return (0);
 }
 
 int parent(int *fd_pipe, int fd_outfile, char *cmd_buffer){
     char **exec_args;
 
-    exec_args = get_args(cmd_buffer);
+    get_args(cmd_buffer);
     close(fd_pipe[1]);
     dup2(fd_pipe[0], 0);
     dup2(fd_outfile, 1);
-    execve(exec_args[0], exec_args, NULL);
+    execve("/bin/", exec_args, NULL);
     return (0);
 }
 

@@ -92,3 +92,44 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
     }
     return (i);
 }
+
+char	*ft_substr(char const *s, unsigned int start, size_t len)
+{
+    size_t	i;
+    char	*buffer;
+
+    i = 0;
+    if (len > ft_strlen(s) - start)
+        len = ft_strlen(s) - start;
+    if (start >= ft_strlen(s))
+        return (ft_strdup(""));
+    buffer = (char *)malloc(sizeof(char) * len + 1);
+    if (!buffer)
+        return (0);
+    while (i < len && s[start] != '\0')
+    {
+        buffer[i] = s[start];
+        i++;
+        start++;
+    }
+    buffer[i] = '\0';
+    return (buffer);
+}
+
+char	*ft_strdup(const char *s1)
+{
+    int		i;
+    char	*buffer;
+
+    i = 0;
+    buffer = malloc(ft_strlen(s1) + 1);
+    if (!buffer)
+        return (0);
+    while (s1[i])
+    {
+        buffer[i] = s1[i];
+        i++;
+    }
+    buffer[i] = '\0';
+    return (buffer);
+}
