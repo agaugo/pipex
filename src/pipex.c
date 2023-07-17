@@ -16,30 +16,6 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 
-// > Launch
-// > Pipe
-// > Fork Process
-
-// > Call Child Process
-//      > Close read end of pipe, pipe[0]
-//      > Redirect stdin to infile
-//      > Redirect stdout to write end of pipe, pipe[1]
-//      > Execute command
-//              > Find path of the appropriate command
-//              > Call execve using the path
-
-// > Call Parent Process
-//      > Close write end of pipe, pipe[1]
-//      > Redirect stdout to outfile
-//      > Redirect stdin to read end of pipe, pipe[0]
-//      > Execute command
-//              > Find path of the appropriate command
-//              > Call execve using the path
-//
-//
-
-//execve(const char *path, char *const argv[], char *const envp[]);
-
 #include "../include/pipex.h"
 
 void    free_all(char **exec_args){
@@ -76,14 +52,13 @@ char **get_args(char *cmd_buffer){
         if (!arg1)
             return (NULL);
         ft_strlcpy(arg1, cmd_buffer, len + 1);
-        exec_args[0] = ft_strjoin("/bin/", arg1);
+        exec_args[0] = ft_strjoin("/usr/bin/", arg1);
         free(arg1);
-        printf("%s\n", exec_args[0]);
         exec_args[1] = ft_substr(cmd_buffer, len + 1, 3);
-        exec_args[3] = NULL;
+        exec_args[2] = NULL;
         return (exec_args);
     }
-    exec_args[0] = ft_strjoin("/bin/", cmd_buffer);;
+    exec_args[0] = ft_strjoin("/usr/bin/", cmd_buffer);;
     exec_args[1] = NULL;
     return (exec_args);
 }
@@ -92,11 +67,14 @@ int child(int *fd_pipe, int fd_infile, char *cmd_buffer){
     char **exec_args;
 
     exec_args = get_args(cmd_buffer);
+    printf("child process (infile) %s %s\n", exec_args[0], exec_args[1]);
     close(fd_pipe[0]);
     dup2(fd_infile, 0);
     dup2(fd_pipe[1], 1);
-    execve(exec_args[0], exec_args, NULL);
-    free(exec_args);
+    if (execve(exec_args[0], exec_args, NULL) == -1) {
+        perror(exec_args[0]);   // print out the error
+        exit(1);               // exit if execve fails
+    }
     return (0);
 }
 
@@ -104,11 +82,14 @@ int parent(int *fd_pipe, int fd_outfile, char *cmd_buffer){
     char **exec_args;
 
     exec_args = get_args(cmd_buffer);
+    printf("parent process (outfile) %s %s\n", exec_args[0], exec_args[1]);
     close(fd_pipe[1]);
     dup2(fd_pipe[0], 0);
     dup2(fd_outfile, 1);
-    execve(exec_args[0], exec_args, NULL);
-    free(exec_args);
+    if (execve(exec_args[0], exec_args, NULL) == -1) {
+        perror(exec_args[0]);   // print out the error
+        exit(1);               // exit if execve fails
+    }
     return (0);
 }
 
