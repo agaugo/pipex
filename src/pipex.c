@@ -34,6 +34,32 @@ int count_args(char *cmd_buffer){
         return (2);
 }
 
+char *get_root_dir(char *arg1) {
+    char *dirs[4];
+    char *return_dir;
+    int i;
+
+    dirs[0] = "/bin/";
+    dirs[1] = "/usr/bin/";
+    dirs[2] = "/usr/local/bin/";
+    dirs[3] = NULL;
+    i = 0;
+    while (dirs[i] != NULL) {
+        return_dir = ft_strjoin(dirs[i], arg1);
+        if (access(return_dir, F_OK) != -1)
+            return (return_dir);
+        free(return_dir);
+        i++;
+    }
+    return (NULL);
+}
+
+//You're right. I apologize for misunderstanding your question. The exec_args array is currently not set up to handle more than one argument. To change this, you will have to split the input command into words and add each word to the exec_args array.
+//
+//First, modify count_args to count all words, not just up to the first space.
+//
+//Then, in get_args, instead of manually extracting the first argument and using ft_substr to get the rest, split the command into words using ft_strsplit or a similar function. The first word is the command name, the rest are arguments. Here's a sketch of how this could look:
+
 char **get_args(char *cmd_buffer){
     char    **exec_args;
     char    *arg1;
@@ -46,20 +72,21 @@ char **get_args(char *cmd_buffer){
     if (!exec_args)
         return (NULL);
     if (count != 1) {
-        while (cmd_buffer[len] != ' ')
+        while (cmd_buffer[len] != ' ' && cmd_buffer[len] != '\0')
             len++;
         arg1 = malloc(sizeof(char) * len + 1);
         if (!arg1)
             return (NULL);
         ft_strlcpy(arg1, cmd_buffer, len + 1);
-        exec_args[0] = ft_strjoin("/usr/bin/", arg1);
+        exec_args[0] = get_root_dir(arg1);
         free(arg1);
         exec_args[1] = ft_substr(cmd_buffer, len + 1, 3);
         exec_args[2] = NULL;
-        return (exec_args);
     }
-    exec_args[0] = ft_strjoin("/usr/bin/", cmd_buffer);;
-    exec_args[1] = NULL;
+    else {
+        exec_args[0] = get_root_dir(cmd_buffer);
+        exec_args[1] = NULL;
+    }
     return (exec_args);
 }
 

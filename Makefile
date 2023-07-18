@@ -10,38 +10,45 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME    = pipex
-CC		= gcc
-CFLAGS	= -Werror -Wextra -Wall
+NAME    	= pipex
+CC      	= gcc
+CFLAGS  	= -Werror -Wextra -Wall
+LDFLAGS 	= -Llibft -lft
 
-SRC_PATH    =   src/
-OBJ_PATH    =   obj/
+SRC_PATH    = src/
+OBJ_PATH    = obj/
+LIBFT_PATH  = libft/
 
-SRC         =	execute.c misc.c pipex.c
-SRCS        =   $(addprefix, $(SRC_PATH), $(SRC))
+SRC         = execute.c pipex.c
+SRCS        = $(addprefix $(SRC_PATH), $(SRC))
 
-OBJ         =   $(SRC:.c=.o)
-OBJS		=	$(addprefix $(OBJ_PATH), $(OBJ))
+OBJ         = $(SRC:.c=.o)
+OBJS        = $(addprefix $(OBJ_PATH), $(OBJ))
 
-INC         =   -I ./include/
+INC         = -I ./include/
 
-all: $(OBJ_PATH) $(NAME)
+all: $(LIBFT_PATH)libft.a $(OBJ_PATH) $(NAME)
+
+$(LIBFT_PATH)libft.a:
+	$(MAKE) -C $(LIBFT_PATH)
 
 $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(INC)
 
 $(OBJ_PATH):
-	mkdir $(OBJ_PATH)
+	mkdir -p $(OBJ_PATH)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
 
 clean:
 	rm -rf $(OBJ_PATH)
+	$(MAKE) -C $(LIBFT_PATH) clean
 
-fclean:	clean
+fclean: clean
 	rm -f $(NAME)
+	$(MAKE) -C $(LIBFT_PATH) fclean
 
-re:	fclean all
+re: fclean all
 
 .PHONY: all clean fclean re
