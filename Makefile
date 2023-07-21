@@ -19,7 +19,7 @@ SRC_PATH    = src/
 OBJ_PATH    = obj/
 LIBFT_PATH  = libft/
 
-SRC         = execute.c pipex.c
+SRC         = get_exe_args.c pipex.c
 SRCS        = $(addprefix $(SRC_PATH), $(SRC))
 
 OBJ         = $(SRC:.c=.o)

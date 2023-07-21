@@ -15,9 +15,10 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
-char	*ft_strjoin(char const *s1, char const *s2);
-size_t	ft_strlen(const char *s);
-char	*ft_strchr(const char *s, int c);
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);
-char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	*ft_strdup(const char *s1);
+void    free_all(char **exec_args);
+int     count_args(char *cmd_buffer);
+char    *get_root_dir(char *arg1);
+char    **get_args(char *cmd_buffer);
+int     child(int *fd_pipe, int fd_infile, char *cmd_buffer);
+int     parent(int *fd_pipe, int fd_outfile, char *cmd_buffer);
+
