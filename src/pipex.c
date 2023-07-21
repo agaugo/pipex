@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include "../libft/libft.h"
 
 #include "../include/pipex.h"
 
@@ -28,10 +29,20 @@ void    free_all(char **exec_args){
 }
 
 int count_args(char *cmd_buffer){
-    if (!ft_strchr(cmd_buffer, ' '))
-        return (1);
-    else
-        return (2);
+    int i;
+    int c;
+
+    i = 0;
+    c = 0;
+    while (cmd_buffer[i] != '\0')
+    {
+        if (cmd_buffer[i] == ' ')
+            c++;
+        i++;
+    }
+    if (c == 0)
+        c++;
+    return (c);
 }
 
 char *get_root_dir(char *arg1) {
@@ -54,40 +65,44 @@ char *get_root_dir(char *arg1) {
     return (NULL);
 }
 
-//You're right. I apologize for misunderstanding your question. The exec_args array is currently not set up to handle more than one argument. To change this, you will have to split the input command into words and add each word to the exec_args array.
-//
+//The exec_args array is currently not set up to handle more than one argument.
+// To change this, you will have to split the input command into words and add
+// each word to the exec_args array.
+
 //First, modify count_args to count all words, not just up to the first space.
-//
-//Then, in get_args, instead of manually extracting the first argument and using ft_substr to get the rest, split the command into words using ft_strsplit or a similar function. The first word is the command name, the rest are arguments. Here's a sketch of how this could look:
+
+//Then, in get_args, instead of manually extracting the first argument and using
+// ft_substr to get the rest, split the command into words using ft_strsplit or
+// a similar function. The first word is the command name, the rest are arguments.
 
 char **get_args(char *cmd_buffer){
-    char    **exec_args;
-    char    *arg1;
+    char    **full_exec_args;
+    char    **partial_exec_args;
     int     count;
-    int     len;
+    int     i;
 
-    len = 0;
+    i = 0;
     count = count_args(cmd_buffer);
-    exec_args = malloc((sizeof(char *) * count + 1));
-    if (!exec_args)
+    full_exec_args = malloc((sizeof(char *) * count + 1));
+    if (!full_exec_args)
         return (NULL);
-    if (count != 1) {
-        while (cmd_buffer[len] != ' ' && cmd_buffer[len] != '\0')
-            len++;
-        arg1 = malloc(sizeof(char) * len + 1);
-        if (!arg1)
-            return (NULL);
-        ft_strlcpy(arg1, cmd_buffer, len + 1);
-        exec_args[0] = get_root_dir(arg1);
-        free(arg1);
-        exec_args[1] = ft_substr(cmd_buffer, len + 1, 3);
-        exec_args[2] = NULL;
+    if (count != 0) {
+        partial_exec_args = ft_split(cmd_buffer, ' ');
+        while (partial_exec_args[i] != NULL)
+        {
+            if (i == 0)
+                full_exec_args[i] = get_root_dir(partial_exec_args[i]);
+            else
+                full_exec_args[i] = partial_exec_args[i];
+            i++;
+        }
+        full_exec_args[i] = NULL;
     }
     else {
-        exec_args[0] = get_root_dir(cmd_buffer);
-        exec_args[1] = NULL;
+        full_exec_args[0] = get_root_dir(cmd_buffer);
+        full_exec_args[1] = NULL;
     }
-    return (exec_args);
+    return (full_exec_args);
 }
 
 int child(int *fd_pipe, int fd_infile, char *cmd_buffer){
