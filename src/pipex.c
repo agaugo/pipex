@@ -61,6 +61,8 @@ int	main(int argc, char *argv[])
 	if (argc != 5)
 		return (0);
 	fd_infile = open(argv[1], O_RDONLY);
+    if (fd_infile == -1)
+        return (0);
 	fd_outfile = open(argv[4], O_WRONLY | O_CREAT, 0644);
 	if (pipe(fd_pipe) < 0)
 		return (1);
