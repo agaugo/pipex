@@ -61,14 +61,14 @@ int	main(int argc, char *argv[])
 	if (argc != 5)
 		return (0);
 	fd_infile = open(argv[1], O_RDONLY);
-    if (fd_infile == -1)
-        return (0);
+    if (fd_infile == -1) {
+        return (0);}
 	fd_outfile = open(argv[4], O_WRONLY | O_CREAT, 0644);
-	if (pipe(fd_pipe) < 0)
-		return (1);
+	if (pipe(fd_pipe) < 0) {
+		return (1); }
 	process_id = fork();
-	if (process_id == 0)
-		child(fd_pipe, fd_infile, argv[2]);
+	if (process_id == 0) {
+		child(fd_pipe, fd_infile, argv[2]);}
 	else
 	{
 		wait(NULL);
