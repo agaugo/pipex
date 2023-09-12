@@ -66,6 +66,8 @@ char	*get_root_dir(char *arg1)
 	return (NULL);
 }
 
+//fix issue with 'awk'
+
 char	**get_args(char *cmd_buffer, int count, int i)
 {
 	char	**full_exec_args;

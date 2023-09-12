@@ -22,7 +22,6 @@ int	child(int *fd_pipe, int fd_infile, char *cmd_buffer)
 	char	**exec_args;
 
 	exec_args = get_args(cmd_buffer, count_args(cmd_buffer), 0);
-	printf("child process (infile) %s %s\n", exec_args[0], exec_args[1]);
 	close(fd_pipe[0]);
 	dup2(fd_infile, 0);
 	dup2(fd_pipe[1], 1);
@@ -39,7 +38,6 @@ int	parent(int *fd_pipe, int fd_outfile, char *cmd_buffer)
 	char	**exec_args;
 
 	exec_args = get_args(cmd_buffer, count_args(cmd_buffer), 0);
-	printf("parent process (outfile) %s %s\n", exec_args[0], exec_args[1]);
 	close(fd_pipe[1]);
 	dup2(fd_pipe[0], 0);
 	dup2(fd_outfile, 1);
