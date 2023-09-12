@@ -28,7 +28,7 @@ char	*ft_strrchr(const char *s, int c)
 		target++;
 		len++;
 	}
-	while (len >= 0)
+	while (len != 0)
 	{
 		if (*(target) == c_char)
 			return (target);
