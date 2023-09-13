@@ -10,15 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <stdlib.h>
+#ifndef PIPEX_H
+# define PIPEX_H
+# include <fcntl.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
 
-void    free_all(char **exec_args);
-int     count_args(char *cmd_buffer);
-char    *get_root_dir(char *arg1);
-char    **get_args(char *cmd_buffer, int count, int i);
-int     child(int *fd_pipe, int fd_infile, char *cmd_buffer);
-int     parent(int *fd_pipe, int fd_outfile, char *cmd_buffer);
+void	free_all(char **exec_args);
+int		count_args(char *cmd_buffer);
+char	*get_root_dir(char *arg1);
+char	**get_args(char *cmd_buffer, int count, int i);
+int		child(int *fd_pipe, int fd_infile, char *cmd_buffer);
+int		parent(int *fd_pipe, int fd_outfile, char *cmd_buffer);
 
+#endif
