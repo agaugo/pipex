@@ -67,32 +67,33 @@ char	*get_root_dir(char *arg1)
 	return (NULL);
 }
 
-char	**get_args(char *cmd_buffer, int count, int i)
+char **get_args(char *cmd_buffer)
 {
-	char	**full_exec_args;
-	char	**partial_exec_args;
+    int i = 0, j = 0;
+    char **args;
+    char **partial_args;
 
-	full_exec_args = malloc((sizeof(char *) * (count + 1)));
-	if (!full_exec_args)
-		return (NULL);
-	if (count != 0)
-	{
-	  
-		partial_exec_args = ft_split(cmd_buffer, ' ');
-		while (partial_exec_args[i] != NULL && i < count)
-		{
-			if (i == 0)
-				full_exec_args[i] = get_root_dir(partial_exec_args[i]);
-			else
-				full_exec_args[i] = partial_exec_args[i];
-			i++;
-		}
-		full_exec_args[i] = NULL;
-	}
-	else
-	{
-		full_exec_args[0] = get_root_dir(cmd_buffer);
-		full_exec_args[1] = NULL;
-	}
-	return (full_exec_args);
+    partial_args = ft_split(cmd_buffer, ' ');
+
+    // Allocate memory for resulting array
+    for (i = 0; partial_args[i] != NULL; i++);
+    args = malloc(sizeof(char *) * (i + 1));
+
+    // Handle the command (first argument)
+    args[0] = get_root_dir(partial_args[0]);
+
+    // Handle all other arguments
+    for (j = 1; j < i; j++) {
+        args[j] = ft_strdup(partial_args[j]);
+    }
+    args[j] = NULL;
+
+    // Free the partial_args array and its contents
+    for (i = 0; partial_args[i] != NULL; i++) {
+        free(partial_args[i]);
+    }
+    free(partial_args);
+
+    return args;
 }
+

@@ -17,58 +17,68 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-int	child(int *fd_pipe, int fd_infile, char *cmd_buffer)
+void child(int *fd_pipe, char **argv)
 {
-	char	**exec_args;
+  char** exec_args;
+  int    infile;
 
-	exec_args = get_args(cmd_buffer, count_args(cmd_buffer), 0);
-	close(fd_pipe[0]);
-	dup2(fd_infile, 0);
-	dup2(fd_pipe[1], 1);
-	if (execve(exec_args[0], exec_args, NULL) == -1)
-	{
-		exit(1);
-	}
-	return (0);
+  infile = open(argv[1], O_RDONLY, 0777);
+  if (infile == -1)
+    exit(1);
+  dup2(fd_pipe[1], 1);
+  dup2(infile, 0);
+  close(fd_pipe[0]);
+  exec_args = get_args(argv[2], count_args(argv[2]), 0);
+  if (execve(exec_args[0], exec_args, NULL) == -1)
+    {
+      free_all(exec_args);
+      exit(1);
+    }
+ 
 }
 
-int	parent(int *fd_pipe, int fd_outfile, char *cmd_buffer)
+void parent(int *fd_pipe, char **argv)
 {
-	char	**exec_args;
+  char** exec_args;
+  int    outfile;
 
-	exec_args = get_args(cmd_buffer, count_args(cmd_buffer), 0);
-	close(fd_pipe[1]);
-	dup2(fd_pipe[0], 0);
-	dup2(fd_outfile, 1);
-	if (execve(exec_args[0], exec_args, NULL) == -1)
-	{
-		exit(1);
-	}
-	return (0);
+  outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+  if (outfile == -1)
+    exit(1);
+  dup2(fd_pipe[0], 0);
+  dup2(outfile, 1);
+  close(fd_pipe[1]);
+  exec_args = get_args(argv[3], count_args(argv[3]), 0);
+  if (execve(exec_args[0], exec_args, NULL) == -1)
+    {
+      free_all(exec_args);
+      exit(1);
+    }
+ 
 }
+
 
 int	main(int argc, char *argv[])
 {
 	int	fd_pipe[2];
 	int	process_id;
-	int	fd_infile;
-	int	fd_outfile;
-
+ 
+	//check for right amount of args
 	if (argc != 5)
 		return (0);
-	fd_infile = open(argv[1], O_RDONLY);
-	if (fd_infile == -1)
-		return (0);
-	fd_outfile = open(argv[4], O_WRONLY | O_CREAT, 0644);
-	if (pipe(fd_pipe) < 0)
-		return (1);
+	//piping to ft_pipe, if error occurs, exit
+	if (pipe(fd_pipe) == -1)
+	  exit(1);
+	//forking process and assigning id to process_id
 	process_id = fork();
+	if (process_id == -1)
+	  exit(1);
+	//if process_id == 0, child process is run
 	if (process_id == 0)
-		child(fd_pipe, fd_infile, argv[2]);
-	else
-	{
-		wait(NULL);
-		parent(fd_pipe, fd_outfile, argv[3]);
-	}
-	return (0);
+	  child(fd_pipe, argv);
+	//if process_id != 0, we wait for child process before running parent process
+	waitpid(process_id, NULL, 0);
+	parent(fd_pipe, argv);
+
+ 	return (0);
 }
