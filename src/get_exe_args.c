@@ -38,8 +38,6 @@ void free_and_exit(char **argv1, char **argv2)
     exit(1);
 }
 
-
-
 int	count_args(char *cmd_buffer)
 {
 	int	i;
@@ -101,7 +99,7 @@ void execute(char *args)
   final_argv = malloc(sizeof(char*) * (i + 1));
   if (!final_argv)
     return ;
-    final_argv[0] = get_root_dir(args_arr[0]);
+  final_argv[0] = get_root_dir(args_arr[0]);
   if (!final_argv[0])
     free_and_exit(final_argv, args_arr);
   i = 1;
