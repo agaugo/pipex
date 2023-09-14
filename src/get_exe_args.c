@@ -16,15 +16,29 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void	free_all(char **exec_args)
+void free_and_exit(char **argv1, char **argv2)
 {
-	int	i;
+  int i;
+  int j;
 
-	i = 0;
-	while (exec_args[i] != NULL)
-		free(exec_args[i]);
-	free(exec_args);
+  i = 0;
+  j = 0;
+  while (argv1[i] != NULL)
+    {
+      free(argv1[i]);
+      i++;
+    }
+  free(argv1);
+  while (argv2[j] != NULL)
+    {
+      free(argv2[j]);
+      j++;
+    }
+    free(argv2);
+    exit(1);
 }
+
+
 
 int	count_args(char *cmd_buffer)
 {
@@ -44,56 +58,61 @@ int	count_args(char *cmd_buffer)
 	return (c);
 }
 
-char	*get_root_dir(char *arg1)
+char *get_root_dir(char *arg1)
 {
-	char	*dirs[4];
-	char	*return_dir;
-	int		i;
+  char	*dirs[4];
+  char	*return_dir;
+  char  *cpy;
+  int	i;
 
-	dirs[0] = "/bin/";
-	dirs[1] = "/usr/bin/";
-	dirs[2] = "/usr/local/bin/";
-	dirs[3] = NULL;
-	i = 0;
-	while (dirs[i] != NULL)
+  dirs[0] = "/bin/";
+  dirs[1] = "/usr/bin/";
+  dirs[2] = "/usr/local/bin/";
+  dirs[3] = NULL;
+  i = 0;
+  cpy = ft_strdup(arg1);
+  while (dirs[i] != NULL)
+    {
+      return_dir = ft_strjoin(dirs[i], cpy);
+      if (access(return_dir, F_OK) != -1)
 	{
-		return_dir = ft_strjoin(dirs[i], arg1);
-		if (access(return_dir, F_OK) != -1)
-			return (return_dir);
-		free(return_dir);
-		i++;
+	  free(cpy);
+	  return(ft_strjoin(dirs[i], arg1));
 	}
-	exit(1);
-	return (NULL);
+      free(return_dir);
+      i++;
+    }
+  free(cpy);
+  return (NULL);
 }
 
-char **get_args(char *cmd_buffer)
+void execute(char *args)
 {
-    int i = 0, j = 0;
-    char **args;
-    char **partial_args;
+  char **args_arr;
+  char **final_argv;
+  int i;
 
-    partial_args = ft_split(cmd_buffer, ' ');
-
-    // Allocate memory for resulting array
-    for (i = 0; partial_args[i] != NULL; i++);
-    args = malloc(sizeof(char *) * (i + 1));
-
-    // Handle the command (first argument)
-    args[0] = get_root_dir(partial_args[0]);
-
-    // Handle all other arguments
-    for (j = 1; j < i; j++) {
-        args[j] = ft_strdup(partial_args[j]);
+  i = 0;
+  args_arr = ft_split(args, ' ');
+  if (!args_arr)
+    return ;
+  while (args_arr[i] != NULL)
+    i++;
+  final_argv = malloc(sizeof(char*) * (i + 1));
+  if (!final_argv)
+    return ;
+    final_argv[0] = get_root_dir(args_arr[0]);
+  if (!final_argv[0])
+    free_and_exit(final_argv, args_arr);
+  i = 1;
+  while (args_arr[i] != NULL)
+    {
+      final_argv[i] = args_arr[i];
+      free(args_arr[i]);
+      i++;
     }
-    args[j] = NULL;
-
-    // Free the partial_args array and its contents
-    for (i = 0; partial_args[i] != NULL; i++) {
-        free(partial_args[i]);
-    }
-    free(partial_args);
-
-    return args;
+  final_argv[i] = NULL;
+  free(args_arr);
+  execve(final_argv[0], final_argv, NULL);
 }
 
