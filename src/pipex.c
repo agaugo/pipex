@@ -27,7 +27,6 @@ int	child(int *fd_pipe, int fd_infile, char *cmd_buffer)
 	dup2(fd_pipe[1], 1);
 	if (execve(exec_args[0], exec_args, NULL) == -1)
 	{
-		perror(exec_args[0]);
 		exit(1);
 	}
 	return (0);
@@ -43,7 +42,6 @@ int	parent(int *fd_pipe, int fd_outfile, char *cmd_buffer)
 	dup2(fd_outfile, 1);
 	if (execve(exec_args[0], exec_args, NULL) == -1)
 	{
-		perror(exec_args[0]);
 		exit(1);
 	}
 	return (0);

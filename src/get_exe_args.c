@@ -63,23 +63,22 @@ char	*get_root_dir(char *arg1)
 		free(return_dir);
 		i++;
 	}
+	exit(1);
 	return (NULL);
 }
-
-//fix issue with 'awk'
 
 char	**get_args(char *cmd_buffer, int count, int i)
 {
 	char	**full_exec_args;
 	char	**partial_exec_args;
 
-	full_exec_args = malloc((sizeof(char *) * count + 1));
+	full_exec_args = malloc((sizeof(char *) * (count + 1)));
 	if (!full_exec_args)
 		return (NULL);
 	if (count != 0)
 	{
 		partial_exec_args = ft_split(cmd_buffer, ' ');
-		while (partial_exec_args[i] != NULL)
+		while (partial_exec_args[i] != NULL && i < count)
 		{
 			if (i == 0)
 				full_exec_args[i] = get_root_dir(partial_exec_args[i]);
