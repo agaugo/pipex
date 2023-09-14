@@ -77,6 +77,7 @@ char	**get_args(char *cmd_buffer, int count, int i)
 		return (NULL);
 	if (count != 0)
 	{
+	  
 		partial_exec_args = ft_split(cmd_buffer, ' ');
 		while (partial_exec_args[i] != NULL && i < count)
 		{
