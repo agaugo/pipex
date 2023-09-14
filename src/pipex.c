@@ -28,7 +28,7 @@ void child(int *fd_pipe, char **argv)
   dup2(fd_pipe[1], 1);
   dup2(infile, 0);
   close(fd_pipe[0]);
-  exec_args = get_args(argv[2], count_args(argv[2]), 0);
+  exec_args = get_args(argv[2]);
   if (execve(exec_args[0], exec_args, NULL) == -1)
     {
       free_all(exec_args);
@@ -48,7 +48,7 @@ void parent(int *fd_pipe, char **argv)
   dup2(fd_pipe[0], 0);
   dup2(outfile, 1);
   close(fd_pipe[1]);
-  exec_args = get_args(argv[3], count_args(argv[3]), 0);
+  exec_args = get_args(argv[3]);
   if (execve(exec_args[0], exec_args, NULL) == -1)
     {
       free_all(exec_args);
