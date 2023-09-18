@@ -12,7 +12,7 @@
 
 NAME    	= pipex
 CC      	= gcc
-CFLAGS  	= -Werror -Wextra -Wall
+CFLAGS  	= -Werror -Wextra -Wall -Ilibft
 LDFLAGS 	= -Llibft -lft
 
 SRC_PATH    = src/
