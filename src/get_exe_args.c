@@ -106,7 +106,6 @@ void execute(char *args)
   while (args_arr[i] != NULL)
     {
       final_argv[i] = args_arr[i];
-      free(args_arr[i]);
       i++;
     }
   final_argv[i] = NULL;

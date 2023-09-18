@@ -21,7 +21,7 @@ void child(int *fd_pipe, char **argv)
 {
    int    infile;
 
-  infile = open(argv[1], O_RDONLY, 0777);
+  infile = open(argv[1], O_RDONLY, 0666);
   if (infile == -1)
     exit(1);
   dup2(fd_pipe[1], 1);
@@ -34,7 +34,7 @@ void parent(int *fd_pipe, char **argv)
 {
   int    outfile;
 
-  outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+  outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0666);
   if (outfile == -1)
     exit(1);
   dup2(fd_pipe[0], 0);
