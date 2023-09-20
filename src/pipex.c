@@ -23,7 +23,7 @@ void	handle_error(int exit_code, const char *message)
 	exit(exit_code);
 }
 
-void	child(int *fd_pipe, char **argv)
+void	child(int *fd_pipe, char **argv, char **envp)
 {
 	int	infile;
 
@@ -35,10 +35,10 @@ void	child(int *fd_pipe, char **argv)
 	if (dup2(infile, 0) == -1)
 		handle_error(1, "Error redirecting input from file");
 	close(fd_pipe[0]);
-	execute(argv[2]);
+	execute(argv[2], envp);
 }
 
-void	parent(int *fd_pipe, char **argv)
+void	parent(int *fd_pipe, char **argv, char **envp)
 {
 	int	outfile;
 
@@ -50,10 +50,10 @@ void	parent(int *fd_pipe, char **argv)
 	if (dup2(outfile, 1) == -1)
 		handle_error(2, "Error redirecting output to file");
 	close(fd_pipe[1]);
-	execute(argv[3]);
+	execute(argv[3], envp);
 }
 
-int	main(int argc, char *argv[])
+int	main(int argc, char *argv[], char *envp[])
 {
 	int	fd_pipe[2];
 	int	process_id;
@@ -66,7 +66,7 @@ int	main(int argc, char *argv[])
 	if (process_id == -1)
 		handle_error(1, "Fork error");
 	if (process_id == 0)
-		child(fd_pipe, argv);
-	parent(fd_pipe, argv);
+		child(fd_pipe, argv, envp);
+	parent(fd_pipe, argv, envp);
 	return (0);
 }

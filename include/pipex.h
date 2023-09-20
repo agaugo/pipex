@@ -20,10 +20,10 @@
 void	free_all(char **exec_args);
 int		count_args(char *cmd_buffer);
 char	*get_root_dir(char *arg1);
-void	child(int *fd_pipe, char **argv);
-void	parent(int *fd_pipe, char **argv);
+void	child(int *fd_pipe, char **argv, char **envp);
+void	parent(int *fd_pipe, char **argv, char **envp);
 char	**get_args(char *cmd_buffer);
-void	execute(char *args);
+void	execute(char *args, char **envp);
 void	handle_error(int exit_code, const char *message);
 
 #endif

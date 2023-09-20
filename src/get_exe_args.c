@@ -89,7 +89,7 @@ int	count(char **arr)
 	return (i);
 }
 
-void	execute(char *args)
+void	execute(char *args, char **envp)
 {
 	char	**args_arr;
 	char	**final_argv;
@@ -110,6 +110,6 @@ void	execute(char *args)
 		free_and_exit(final_argv, args_arr);
 	copy_arr(final_argv, args_arr);
 	free(args_arr);
-	execve(final_argv[0], final_argv, NULL);
+	execve(final_argv[0], final_argv, envp);
 	handle_error(1, "Failed to run command");
 }
