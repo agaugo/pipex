@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
 #include "libft.h"
+#include "pipex.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -35,7 +35,8 @@ void	free_and_exit(char **argv1, char **argv2)
 		j++;
 	}
 	free(argv2);
-	exit(1);
+	perror("Failure to execute command");
+	exit(127);
 }
 
 int	count_args(char *cmd_buffer)
@@ -93,13 +94,16 @@ void	execute(char *args)
 	i = 0;
 	args_arr = ft_split(args, ' ');
 	if (!args_arr || ft_strlen(args) == 0)
-		exit(1);
+		exit(127);
 	while (args_arr[i] != NULL)
 		i++;
 	final_argv = malloc(sizeof(char *) * (i + 1));
 	if (!final_argv)
 		return ;
-	final_argv[0] = get_root_dir(args_arr[0]);
+	if (access(args_arr[0], X_OK) != -1)
+		final_argv[0] = args_arr[0];
+	else if (access(args_arr[0], X_OK == -1))
+		final_argv[0] = get_root_dir(args_arr[0]);
 	if (!final_argv[0])
 		free_and_exit(final_argv, args_arr);
 	i = 1;
@@ -111,4 +115,6 @@ void	execute(char *args)
 	final_argv[i] = NULL;
 	free(args_arr);
 	execve(final_argv[0], final_argv, NULL);
+	perror("Failed to run command");
+	exit(1);
 }
