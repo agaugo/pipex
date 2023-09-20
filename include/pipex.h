@@ -24,5 +24,6 @@ void	child(int *fd_pipe, char **argv);
 void	parent(int *fd_pipe, char **argv);
 char	**get_args(char *cmd_buffer);
 void	execute(char *args);
+void	handle_error(int exit_code, const char *message);
 
 #endif

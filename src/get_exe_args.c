@@ -35,26 +35,7 @@ void	free_and_exit(char **argv1, char **argv2)
 		j++;
 	}
 	free(argv2);
-	perror("Failure to execute command");
-	exit(127);
-}
-
-int	count_args(char *cmd_buffer)
-{
-	int	i;
-	int	c;
-
-	i = 0;
-	c = 0;
-	while (cmd_buffer[i] != '\0')
-	{
-		if (cmd_buffer[i] == ' ')
-			c++;
-		i++;
-	}
-	if (c == 0)
-		c++;
-	return (c);
+	handle_error(127, "Failed to execute command");
 }
 
 char	*get_root_dir(char *arg1)
@@ -85,19 +66,40 @@ char	*get_root_dir(char *arg1)
 	return (NULL);
 }
 
+void	copy_arr(char **arr1, char **arr2)
+{
+	int	i;
+
+	i = 1;
+	while (arr2[i] != NULL)
+	{
+		arr1[i] = arr2[i];
+		i++;
+	}
+	arr1[i] = NULL;
+}
+
+int	count(char **arr)
+{
+	int	i;
+
+	i = 0;
+	while (arr[i] != NULL)
+		i++;
+	return (i);
+}
+
 void	execute(char *args)
 {
 	char	**args_arr;
 	char	**final_argv;
-	int		i;
+	int		size;
 
-	i = 0;
 	args_arr = ft_split(args, ' ');
 	if (!args_arr || ft_strlen(args) == 0)
-		exit(127);
-	while (args_arr[i] != NULL)
-		i++;
-	final_argv = malloc(sizeof(char *) * (i + 1));
+		handle_error(127, "Failed to run command");
+	size = count(args_arr);
+	final_argv = malloc(sizeof(char *) * (size + 1));
 	if (!final_argv)
 		return ;
 	if (access(args_arr[0], X_OK) != -1)
@@ -106,15 +108,8 @@ void	execute(char *args)
 		final_argv[0] = get_root_dir(args_arr[0]);
 	if (!final_argv[0])
 		free_and_exit(final_argv, args_arr);
-	i = 1;
-	while (args_arr[i] != NULL)
-	{
-		final_argv[i] = args_arr[i];
-		i++;
-	}
-	final_argv[i] = NULL;
+	copy_arr(final_argv, args_arr);
 	free(args_arr);
 	execve(final_argv[0], final_argv, NULL);
-	perror("Failed to run command");
-	exit(1);
+	handle_error(1, "Failed to run command");
 }
